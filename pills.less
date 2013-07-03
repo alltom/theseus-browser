@@ -1,0 +1,85 @@
+.pill-gutter {
+	width: 45px;
+}
+
+.theseus-call-count {
+	pointer-events: auto;
+	color: #111;
+	font-family: sans-serif;
+	font-size: 12px;
+	/* line-height: 0; */ /* otherwise sans-serif font pushes line height > 15px */ /* outside brackets line-height:0 seems to break things */
+	background: #fff;
+	border: 1px solid #0186cc;
+	border-radius: 0 6px 6px 0;
+	border-left: 0;
+	padding: 0 5px 0 4px;
+	cursor: pointer;
+	white-space: nowrap;
+
+	&:hover {
+		background: #0186cc;
+		color: #fff;
+	}
+
+	&:active {
+		color: #00f;
+	}
+
+	&.uninitialized {
+	}
+
+	&.none {
+		border-color: #ccc;
+		color: #666;
+
+		&:hover {
+			background: #ccc;
+			color: #fff;
+		}
+
+		&:active {
+			color: #000;
+		}
+
+		&.set {
+			box-shadow: 0 0 4px 1px #ccc;
+			background: #ccc;
+			border-color: #ccc;
+			color: #000;
+		}
+	}
+
+	&.exception {
+		border-width: 0;
+		box-shadow: 0 0 2px 1px #f00;
+		color: #950000;
+
+		&:hover {
+			background: #f00;
+			color: #fff;
+		}
+
+		&.set {
+			box-shadow: 0 0 4px 1px #f00;
+			background: #ffc0c0;
+			color: #000;
+		}
+	}
+
+	&.set {
+		border-width: 0;
+		box-shadow: 0 0 4px 1px #0186cc;
+		background: #c1e1f2;
+
+		.glyph {
+			display: inline;
+			position: relative;
+			top: 1px;
+		}
+	}
+
+	.glyph {
+		display: none;
+		margin-left: 5px;
+	}
+}

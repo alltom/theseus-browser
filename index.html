@@ -1,0 +1,188 @@
+<link rel="stylesheet/less" type="text/css" href="pills.less" />
+<script src="less.js?theseus=no" type="text/javascript"></script>
+<script src="fondue.browser.js?theseus=no" type="text/javascript"></script>
+<script>
+fondue = require("fondue");
+</script>
+
+<style>
+.CodeMirror {
+	border: 1px solid black;
+}
+/* TIMELINES */
+.timeline {
+	position: absolute;
+	width: 20px;
+	height: 4px;
+	border: solid #ccc;
+	border-width: 1px 0;
+}
+.scaler {
+	position: absolute;
+	width: 1px;
+	height: 100%;
+}
+.tick {
+	position: absolute;
+	width: 1px;
+	height: 100%;
+	background: #000;
+}
+</style>
+
+<script type="text/javascript" src="jquery.js?theseus=no"></script>
+
+<script src="codemirror-3.13/lib/codemirror.js?theseus=no"></script>
+<link rel="stylesheet" href="codemirror-3.13/lib/codemirror.css">
+<script src="codemirror-3.13/mode/javascript/javascript.js?theseus=no"></script>
+
+<script>
+var css = document.styleSheets[0];
+function newRule(selector) {
+	var newRuleIndex = css.rules.length;
+	css.addRule(selector);
+	return css.rules[newRuleIndex];
+}
+var scalerRule = newRule('.scaler');
+var tickRule = newRule('.tick');
+
+var start = new Date();
+var graphWidth = 20;
+var ticksPerSecond = 30;
+
+function scale(factor) {
+	scalerRule.style['-webkit-transform'] = 'scale(' + factor + ', 1)';
+	tickRule.style['-webkit-transform'] = 'scale(' + (1/factor) + ', 1)';
+}
+function scaleGraphs() {
+	var dt = ((new Date) - start) / 1000;
+	scale(graphWidth / dt / ticksPerSecond);
+}
+
+function makeTimeline(name) {
+	var $container = $('<div />').css('right', '0 !important').css('left', 'auto !important');
+	var $shift = $('<div />').css({ position: 'relative', top: '-8px' }).appendTo($container);
+	var $timeline = $('<div />').addClass('timeline').attr('id', name).appendTo($shift);
+	$('<div />').addClass('scaler').appendTo($timeline);
+	return $container[0];
+}
+function addTick(which) {
+	var dt = ((new Date) - start) / 1000;
+	var tick = $('<div />').addClass('tick').css('left', dt * ticksPerSecond);
+	$('#' + which + ' .scaler').append(tick);
+	scaleGraphs();
+}
+
+/** line: number or handle **/
+function PillView(codeMirror, line) {
+	this.codeMirror = codeMirror;
+	this.$dom = $('<span class="theseus-call-count none"><span class="counts">0 calls</span></span>');
+	codeMirror.setGutterMarker(line, 'pill-gutter', this.$dom[0]);
+}
+PillView.prototype = {
+	setCount: function (count) {
+		var html = count + ' call' + (count === 1 ? '' : 's');
+		this.$dom.find('.counts').html(html);
+		this.$dom.toggleClass("none", count === 0);
+	},
+	setHasExceptions: function (hasExceptions) {
+		this.$dom.toggleClass('exception', hasExceptions);
+	},
+};
+
+$(function () {
+	var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+		lineNumbers: true,
+		 gutters: ['pill-gutter'],
+	});
+	
+	var src = editor.getValue();
+	var path = "script1";
+	var instrumentedSrc = fondue.instrument(src, {
+		tracer_name: "fiddleTracer",
+		path: path,
+	});
+	eval(instrumentedSrc);
+	
+	var regex = /\/\*([a-z0-9]+)\*\//;
+	editor.eachLine(function (line) {
+		var m = regex.exec(line.text);
+		if (m) {
+			line.text = line.text.replace(regex, '');
+			editor.addWidget({ line: editor.getLineNumber(line), ch: m.index }, makeTimeline(m[1]));
+		}
+	});
+	
+	var nodesById = {};
+	var pillsByNodeId = {};
+	var nodesHandle = fiddleTracer.trackNodes();
+	fiddleTracer.newNodes(nodesHandle).filter(function (node) {
+		return node.path === path;
+	}).forEach(function (node) {
+		nodesById[node.id] = node;
+		if (node.type === "function") {
+			pillsByNodeId[node.id] = new PillView(editor, node.start.line - 1);
+		}
+	});
+	
+	var hitsHandle = fiddleTracer.trackHits();
+	var totalHitsByNodeId = {};
+	setInterval(function () {
+		var delta = fiddleTracer.hitCountDeltas(hitsHandle);
+		for (var nodeId in delta) {
+			var pill = pillsByNodeId[nodeId];
+			if (delta.hasOwnProperty(nodeId) && pill) {
+				totalHitsByNodeId[nodeId] || (totalHitsByNodeId[nodeId] = 0);
+				totalHitsByNodeId[nodeId] += delta[nodeId];
+				pill.setCount(totalHitsByNodeId[nodeId]);
+			}
+		}
+	}, 100);
+
+	fondue.on('hits', function (deltas, totals) {
+		for (var nodeId in totals) {
+			if (nodeId in pillsByNodeId) {
+				pillsByNodeId[nodeId].setCount(totals[nodeId]);
+			}
+		}
+	});
+	fondue.on('exceptions', function (deltas, totals) {
+		for (var nodeId in totals) {
+			if (nodeId in pillsByNodeId) {
+				pillsByNodeId[nodeId].setHasExceptions(true);
+			}
+		}
+	});
+	
+//	setTimeout(function () { pill1.setCount(1) }, 2000);
+//	setTimeout(function () { pill2.setCount(2) }, 3000);
+//	setTimeout(function () { pill2.setCount(3); pill2.setHasExceptions(true) }, 4000);
+
+//	eval($('#code').text());
+
+	setInterval(scaleGraphs, 1000/10);
+});
+</script>
+
+<textarea id="code">
+$(document.body).on('mousemove', function () { /*mousemove*/
+	addTick('mousemove');
+});
+
+$(document.body).on('click', function () { /*click*/
+	addTick('click');
+});
+
+$(document.body).on('keypress', function () { /*keypress*/
+	addTick('keypress');
+});
+
+setInterval(function () { /*timer*/
+	addTick('timer');
+	if (Math.random() &lt; 0.1) { /*branch1*/
+		addTick('branch1');
+	} else { /*branch2*/
+		addTick('branch2');
+	}
+}, 500);
+</textarea>

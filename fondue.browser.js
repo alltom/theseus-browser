@@ -1,0 +1,1 @@
+../fondue/lib/fondue.browser.js
