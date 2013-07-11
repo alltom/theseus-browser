@@ -1,9 +1,11 @@
 <link rel="stylesheet/less" type="text/css" href="pill.less" />
 <script src="less.js?theseus=no" type="text/javascript"></script>
 <script src="fondue.browser.js?theseus=no" type="text/javascript"></script>
+<script src="smokesignals.js" type="text/javascript"></script>
 <script src="pill.js" type="text/javascript"></script>
 <script src="glyph.js" type="text/javascript"></script>
 <script src="cycle.js" type="text/javascript"></script>
+<script src="handle.js" type="text/javascript"></script>
 <script>
 fondue = require("fondue");
 </script>
@@ -28,19 +30,6 @@ var _glyphCycle = {
 		return new Glyph(_shapeCycle.next(), _colorCycle.next());
 	},
 };
-
-function LogHandle(tracer_, query) {
-	var handle = tracer_.trackLogs(query);
-
-	return {
-		fetch: function () {
-			return tracer_.logDelta(handle, 10);
-		},
-		count: function () {
-			return tracer_.logCount(handle);
-		},
-	};
-}
 
 $(function () {
 	var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
@@ -81,10 +70,9 @@ $(function () {
 		}
 	});
 	
-	var hitsHandle = fiddleTracer.trackHits();
+	var hitsHandle = new HitsHandle(fiddleTracer);
 	var totalHitsByNodeId = {};
-	setInterval(function () {
-		var delta = fiddleTracer.hitCountDeltas(hitsHandle);
+	hitsHandle.on("data", function (delta) {
 		for (var nodeId in delta) {
 			var pill = pillsByNodeId[nodeId];
 			if (delta.hasOwnProperty(nodeId) && pill) {
@@ -93,7 +81,7 @@ $(function () {
 				pill.setCount(totalHitsByNodeId[nodeId]);
 			}
 		}
-	}, 100);
+	});
 });
 </script>
 
