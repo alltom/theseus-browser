@@ -29,23 +29,23 @@ var _glyphCycle = {
 	},
 };
 
- function LogHandle(tracer_, query) {
-	 var handle = tracer_.trackLogs(query);
-	 
-	 return {
-		 fetch: function () {
-			 return tracer_.logDelta(handle, 10);
-		 },
-		 count: function () {
-			 return tracer_.logCount(handle);
-		 },
-	 };
- }
+function LogHandle(tracer_, query) {
+	var handle = tracer_.trackLogs(query);
+
+	return {
+		fetch: function () {
+			return tracer_.logDelta(handle, 10);
+		},
+		count: function () {
+			return tracer_.logCount(handle);
+		},
+	};
+}
 
 $(function () {
 	var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
 		lineNumbers: true,
-		 gutters: ['pill-gutter'],
+		gutters: ['pill-gutter'],
 	});
 	
 	var src = editor.getValue();
