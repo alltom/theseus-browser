@@ -18,11 +18,54 @@ fondue = require("fondue");
 <script src="codemirror-3.13/mode/javascript/javascript.js?theseus=no"></script>
 
 <script>
-/** line: number or handle **/
+/**
+shape: "circle" or "square"
+color: CSS color string like "#1f77b4"
+**/
+function Glyph(shape, color) {
+	this._shape = shape;
+	this._color = color;
+}
+Glyph.prototype = {
+	svg: function () {
+		if (this._shape === "circle") {
+			return '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" class="glyph"><circle cx="5" cy="5" r="5" fill="' + this._color + '" /></svg>';
+		} else if (this._shape === "square") {
+			return '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" class="glyph"><rect x="1" y="1" width="8" height="8" fill="' + this._color + '" /></svg>';
+		}
+	},
+};
+
+function Cycle(values) {
+	this._values = values;
+	this._next = 0;
+}
+Cycle.prototype = {
+	next: function () {
+		var value = this._values[this._next];
+		this._next = (this._next + 1) % this._values.length;
+		return value;
+	}
+};
+
+var _colorCycle = new Cycle("#1f77b4 #ff7f0e #2ca02c #d62728 #9467bd #8c564b #e377c2 #7f7f7f #bcbd22 #17becf #000000".split(" "));
+var _shapeCycle = new Cycle(["circle", "square"]);
+var _glyphCycle = {
+	next: function () {
+		return new Glyph(_shapeCycle.next(), _colorCycle.next());
+	},
+};
+
+/**
+line: number or handle
+Listen for clicks with pillView.on("click", function () {})
+**/
 function PillView(codeMirror, line) {
 	this.codeMirror = codeMirror;
 	this.$dom = $('<span class="theseus-call-count none"><span class="counts">0 calls</span></span>');
+	this.$dom.append(_glyphCycle.next().svg());
 	codeMirror.setGutterMarker(line, 'pill-gutter', this.$dom[0]);
+	this.on = this.$dom.on.bind(this.$dom);
 }
 PillView.prototype = {
 	setCount: function (count) {
@@ -31,9 +74,27 @@ PillView.prototype = {
 		this.$dom.toggleClass("none", count === 0);
 	},
 	setHasExceptions: function (hasExceptions) {
-		this.$dom.toggleClass('exception', hasExceptions);
+		this.hasExceptions = hasExceptions;
+		this.$dom.toggleClass("exception", hasExceptions);
+	},
+	setActive: function (isActive) {
+		this.isActive = isActive;
+		this.$dom.toggleClass('active', isActive);
 	},
 };
+
+ function LogHandle(tracer_, query) {
+	 var handle = tracer_.trackLogs(query);
+	 
+	 return {
+		 fetch: function () {
+			 return tracer_.logDelta(handle, 10);
+		 },
+		 count: function () {
+			 return tracer_.logCount(handle);
+		 },
+	 };
+ }
 
 $(function () {
 	var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
@@ -49,6 +110,16 @@ $(function () {
 	});
 	eval(instrumentedSrc);
 	
+	var query = { ids: [], eventNames: [], exceptions: false, logs: false };
+	var logHandle = new LogHandle(fiddleTracer, query); // !!!
+	
+	var countConsoleLogsHandle = new LogHandle(fiddleTracer, { ids: [], logs: true });
+	var countExceptionsHandle = new LogHandle(fiddleTracer, { ids: [], exceptions: true });
+	
+	function queryChanged() {
+		logHandle = fiddleTracer.trackLogs(query);
+	}
+	
 	var nodesById = {};
 	var pillsByNodeId = {};
 	var nodesHandle = fiddleTracer.trackNodes();
@@ -57,7 +128,10 @@ $(function () {
 	}).forEach(function (node) {
 		nodesById[node.id] = node;
 		if (node.type === "function") {
-			pillsByNodeId[node.id] = new PillView(editor, node.start.line - 1);
+			var pill = pillsByNodeId[node.id] = new PillView(editor, node.start.line - 1);
+			pill.on("click", function () {
+				pill.setActive(!pill.isActive);
+			});
 		}
 	});
 	
@@ -91,5 +165,5 @@ setInterval(function () {
 	if (Math.random() &lt; 0.1) {
 	} else {
 	}
-}, 500);
+}, 2000);
 </textarea>
