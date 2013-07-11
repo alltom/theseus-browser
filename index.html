@@ -3,6 +3,7 @@
 <script src="fondue.browser.js?theseus=no" type="text/javascript"></script>
 <script src="pill.js" type="text/javascript"></script>
 <script src="glyph.js" type="text/javascript"></script>
+<script src="cycle.js" type="text/javascript"></script>
 <script>
 fondue = require("fondue");
 </script>
@@ -20,18 +21,6 @@ fondue = require("fondue");
 <script src="codemirror-3.13/mode/javascript/javascript.js?theseus=no"></script>
 
 <script>
-function Cycle(values) {
-	this._values = values;
-	this._next = 0;
-}
-Cycle.prototype = {
-	next: function () {
-		var value = this._values[this._next];
-		this._next = (this._next + 1) % this._values.length;
-		return value;
-	}
-};
-
 var _colorCycle = new Cycle("#1f77b4 #ff7f0e #2ca02c #d62728 #9467bd #8c564b #e377c2 #7f7f7f #bcbd22 #17becf #000000".split(" "));
 var _shapeCycle = new Cycle(["circle", "square"]);
 var _glyphCycle = {
