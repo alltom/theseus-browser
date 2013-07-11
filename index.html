@@ -1,6 +1,8 @@
-<link rel="stylesheet/less" type="text/css" href="pills.less" />
+<link rel="stylesheet/less" type="text/css" href="pill.less" />
 <script src="less.js?theseus=no" type="text/javascript"></script>
 <script src="fondue.browser.js?theseus=no" type="text/javascript"></script>
+<script src="pill.js" type="text/javascript"></script>
+<script src="glyph.js" type="text/javascript"></script>
 <script>
 fondue = require("fondue");
 </script>
@@ -18,24 +20,6 @@ fondue = require("fondue");
 <script src="codemirror-3.13/mode/javascript/javascript.js?theseus=no"></script>
 
 <script>
-/**
-shape: "circle" or "square"
-color: CSS color string like "#1f77b4"
-**/
-function Glyph(shape, color) {
-	this._shape = shape;
-	this._color = color;
-}
-Glyph.prototype = {
-	svg: function () {
-		if (this._shape === "circle") {
-			return '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" class="glyph"><circle cx="5" cy="5" r="5" fill="' + this._color + '" /></svg>';
-		} else if (this._shape === "square") {
-			return '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" class="glyph"><rect x="1" y="1" width="8" height="8" fill="' + this._color + '" /></svg>';
-		}
-	},
-};
-
 function Cycle(values) {
 	this._values = values;
 	this._next = 0;
@@ -53,33 +37,6 @@ var _shapeCycle = new Cycle(["circle", "square"]);
 var _glyphCycle = {
 	next: function () {
 		return new Glyph(_shapeCycle.next(), _colorCycle.next());
-	},
-};
-
-/**
-line: number or handle
-Listen for clicks with pillView.on("click", function () {})
-**/
-function PillView(codeMirror, line) {
-	this.codeMirror = codeMirror;
-	this.$dom = $('<span class="theseus-call-count none"><span class="counts">0 calls</span></span>');
-	this.$dom.append(_glyphCycle.next().svg());
-	codeMirror.setGutterMarker(line, 'pill-gutter', this.$dom[0]);
-	this.on = this.$dom.on.bind(this.$dom);
-}
-PillView.prototype = {
-	setCount: function (count) {
-		var html = count + ' call' + (count === 1 ? '' : 's');
-		this.$dom.find('.counts').html(html);
-		this.$dom.toggleClass("none", count === 0);
-	},
-	setHasExceptions: function (hasExceptions) {
-		this.hasExceptions = hasExceptions;
-		this.$dom.toggleClass("exception", hasExceptions);
-	},
-	setActive: function (isActive) {
-		this.isActive = isActive;
-		this.$dom.toggleClass('active', isActive);
 	},
 };
 
@@ -128,7 +85,7 @@ $(function () {
 	}).forEach(function (node) {
 		nodesById[node.id] = node;
 		if (node.type === "function") {
-			var pill = pillsByNodeId[node.id] = new PillView(editor, node.start.line - 1);
+			var pill = pillsByNodeId[node.id] = new PillView(editor, node.start.line - 1, _glyphCycle.next());
 			pill.on("click", function () {
 				pill.setActive(!pill.isActive);
 			});
