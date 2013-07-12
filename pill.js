@@ -20,7 +20,13 @@ PillView.prototype = {
 		this.$dom.toggleClass("exception", hasExceptions);
 	},
 	setActive: function (isActive) {
-		this.isActive = isActive;
+		this._active = isActive;
 		this.$dom.toggleClass('active', isActive);
+	},
+	isActive: function () {
+		return this._active;
+	},
+	toggle: function () {
+		this.setActive(!this._active);
 	},
 };

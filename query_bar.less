@@ -1,0 +1,42 @@
+.query-bar {
+	margin: 4px 0;
+
+	.query-bar-item {
+		margin-right: 8px;
+		cursor: pointer;
+		padding: 2px;
+		display: inline-block;
+		vertical-align: baseline;
+		user-select: none;
+		-webkit-user-select: none;
+
+		&.active {
+			border-radius: 4px;
+			box-shadow: 0 0 4px 1px #0186cc;
+			background: #c1e1f2;
+		}
+
+		&:hover { .name, .hits { color: #0186cc; } }
+		&:active { .name, .hits { color: #cc0186; } }
+
+		.name {
+			margin-right: 3px;
+		}
+
+		.count {
+			font-weight: bold;
+		}
+
+		&.exceptions {
+			.name {
+				color: #f00;
+			}
+		}
+
+		&.logs {
+			.name {
+				color: #060;
+			}
+		}
+	}
+}
