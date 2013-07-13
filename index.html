@@ -63,7 +63,7 @@ $(function () {
 	});
 	eval(instrumentedSrc);
 
-	var logHandle = LogHandle(fiddleTracer, { ids: [], eventNames: [], exceptions: false, logs: false });
+	var logHandle = LogHandle(fiddleTracer, { ids: [], eventNames: [], exceptions: true, logs: true });
 	var nodesHandle = NodesHandle(fiddleTracer);
 	var hitsHandle = HitsHandle(fiddleTracer);
 	var countConsoleLogsHandle = LogHandle(fiddleTracer, { logs: true }, false /* autoFetch */);
@@ -99,11 +99,13 @@ $(function () {
 	logItem.sortIndex = -1;
 	logItem.$dom.addClass("logs");
 	logItem.on("click", queryBarItemClicked);
+	logItem.setActive(logHandle.lastQuery.logs);
 	logItem.addToQuery = function (query) { query.logs = true };
 	logItem.removeFromQuery = function (query) { query.logs = false };
 	exceptionItem.sortIndex = -2;
 	exceptionItem.$dom.addClass("exceptions");
 	exceptionItem.on("click", queryBarItemClicked);
+	exceptionItem.setActive(logHandle.lastQuery.exceptions);
 	exceptionItem.addToQuery = function (query) { query.exceptions = true };
 	exceptionItem.removeFromQuery = function (query) { query.exceptions = false };
 
