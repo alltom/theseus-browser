@@ -39,9 +39,13 @@ change sortIndex to affect its sorting order
 
 name: name to appear in the bar
 **/
-function QueryBarItem(name) {
+function QueryBarItem(name, glyph) {
 	var $dom = $("<span class='query-bar-item' />");
 	var $name = $("<span class='name' />").appendTo($dom).text(name);
+	if (glyph) {
+		$name.prepend(" ");
+		$name.prepend(glyph.svg());
+	}
 	$dom.append(" ");
 	var $count = $("<span class='count' />").appendTo($dom).text("0");
 

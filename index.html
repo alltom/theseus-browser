@@ -62,7 +62,7 @@ $(function () {
 		path: path,
 	});
 	eval(instrumentedSrc);
-	
+
 	var logHandle = LogHandle(fiddleTracer, { ids: [], eventNames: [], exceptions: false, logs: false });
 	var nodesHandle = NodesHandle(fiddleTracer);
 	var hitsHandle = HitsHandle(fiddleTracer);
@@ -131,7 +131,7 @@ $(function () {
 			// add items that are now in the query
 			setDifference(newQuery.ids, Object.keys(nodeItems)).forEach(function (nodeId) {
 				var node = nodesHandle.nodeWithId(nodeId);
-				var item = nodeItems[nodeId] = QueryBarItem(node.name);
+				var item = nodeItems[nodeId] = QueryBarItem(node.name, nodeGlyphs[nodeId]);
 				item.setActive(true);
 				item.setCount(totalHitsByNodeId[nodeId] || 0);
 
