@@ -122,6 +122,7 @@ $(function () {
 				var node = nodesHandle.nodeWithId(nodeId);
 				var item = nodeItems[nodeId] = QueryBarItem(node.name);
 				item.setActive(true);
+				item.setCount(totalHitsByNodeId[nodeId] || 0);
 
 				item.sortIndex = 0;
 				item.addToQuery = function (query) { addToSet(query.ids, node.id) };
@@ -157,11 +158,17 @@ $(function () {
 	var totalHitsByNodeId = {};
 	hitsHandle.on("hits", function (delta) {
 		for (var nodeId in delta) {
+			totalHitsByNodeId[nodeId] || (totalHitsByNodeId[nodeId] = 0);
+			totalHitsByNodeId[nodeId] += delta[nodeId];
+
 			var pill = pillsByNodeId[nodeId];
-			if (delta.hasOwnProperty(nodeId) && pill) {
-				totalHitsByNodeId[nodeId] || (totalHitsByNodeId[nodeId] = 0);
-				totalHitsByNodeId[nodeId] += delta[nodeId];
+			if (pill) {
 				pill.setCount(totalHitsByNodeId[nodeId]);
+			}
+
+			var item = nodeItems[nodeId];
+			if (item) {
+				item.setCount(totalHitsByNodeId[nodeId]);
 			}
 		}
 	});
