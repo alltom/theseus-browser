@@ -1,3 +1,7 @@
+/**
+returns a QueryBarView
+call QueryBarItem() to get items for passing to enableItem and disableItem
+**/
 function QueryBarView() {
 	var $dom = $("<div class='query-bar' />");
 
@@ -29,7 +33,7 @@ function QueryBarView() {
 }
 
 /**
-creates a QueryBarItem
+returns a QueryBarItem for use with a QueryBarView
 listen for clicks with item.on("click", function (item) { })
 change sortIndex to affect its sorting order
 

@@ -1,9 +1,13 @@
 <link rel="stylesheet/less" type="text/css" href="pill.less" />
 <link rel="stylesheet/less" type="text/css" href="query_bar.less" />
+<link rel="stylesheet/less" type="text/css" href="log.less" />
 <script src="less.js?theseus=no" type="text/javascript"></script>
+<script src="moment.min.js?theseus=no" type="text/javascript"></script>
 <script src="fondue.browser.js?theseus=no" type="text/javascript"></script>
 <script src="smokesignals.js" type="text/javascript"></script>
 <script src="set.js" type="text/javascript"></script>
+<script src="tree.js" type="text/javascript"></script>
+<script src="log.js" type="text/javascript"></script>
 <script src="pill.js" type="text/javascript"></script>
 <script src="glyph.js" type="text/javascript"></script>
 <script src="cycle.js" type="text/javascript"></script>
@@ -13,6 +17,10 @@
 <style>
 .CodeMirror {
 	border: 1px solid black;
+}
+body, th, td {
+	font-family: "Helvetica Neue", sans-serif;
+	font-size: 14px;
 }
 </style>
 
@@ -54,8 +62,11 @@ $(function () {
 
 	var pillsByNodeId = {};
 	
+	var logView = LogView(logHandle, nodesHandle);
 	var queryBar = QueryBarView();
+
 	queryBar.$dom.insertAfter(editor.getWrapperElement());
+	logView.$dom.insertAfter(queryBar.$dom);
 
 	function queryBarItemClicked(item) {
 		item.toggle();
@@ -100,8 +111,6 @@ $(function () {
 		if (newQuery.ids) {
 			// remove items that aren't in the query any more
 			setDifference(Object.keys(nodeItems), newQuery.ids).forEach(function (nodeId) {
-				console.log(nodeId, "was removed");
-
 				var item = nodeItems[nodeId];
 				queryBar.disableItem(item);
 				delete nodeItems[nodeId];
@@ -109,8 +118,6 @@ $(function () {
 
 			// add items that are now in the query
 			setDifference(newQuery.ids, Object.keys(nodeItems)).forEach(function (nodeId) {
-				console.log(nodeId, "was added");
-
 				var node = nodesHandle.nodeWithId(nodeId);
 				var item = nodeItems[nodeId] = QueryBarItem(node.name);
 				item.setActive(true);
@@ -123,9 +130,6 @@ $(function () {
 				queryBar.enableItem(item);
 			});
 		}
-	});
-	logHandle.on("entries", function (entries) {
-		console.log("got log entries", entries);
 	});
 
 	nodesHandle.on("nodes", function (nodes) {
