@@ -1,8 +1,13 @@
+/* global smokesignals: true */
+/* exported TreeView, TreeItemView */
+
 /**
 returns a TreeView
 call TreeItemView() to get items
 **/
 function TreeView() {
+	"use strict";
+
 	var $dom = $("<div class='tree' />");
 
 	var roots = [];
@@ -14,12 +19,13 @@ function TreeView() {
 		} else {
 			console.log("tree item removed event from an unknown root");
 		}
-	};
+	}
 
 	var self = {
 		$dom: $dom,
 		append: function (itemView) {
 			roots.push(itemView);
+			itemView.on("removed", itemRemoved);
 			$dom.append(itemView.$dom);
 		},
 		clear: function () {
@@ -36,6 +42,8 @@ function TreeView() {
 returns a TreeItemView for use with a TreeView
 **/
 function TreeItemView() {
+	"use strict";
+
 	var $dom = $("<div class='tree-item' />");
 	var $content = $("<div class='tree-item-content' />").appendTo($dom);
 	var $children = $("<div class='tree-item-children' />").appendTo($dom);

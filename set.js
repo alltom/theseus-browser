@@ -1,4 +1,8 @@
+/* exported addToSet, removeFromSet, setDifference */
+
 function addToSet(array, item) {
+	"use strict";
+
 	if (array.indexOf(item) === -1) {
 		array.push(item);
 		return true;
@@ -6,6 +10,8 @@ function addToSet(array, item) {
 }
 
 function removeFromSet(array, item) {
+	"use strict";
+
 	var idx = array.indexOf(item);
 	if (idx !== -1) {
 		array.splice(idx, 1);
@@ -15,6 +21,8 @@ function removeFromSet(array, item) {
 
 /** returns a - b **/
 function setDifference(a, b) {
+	"use strict";
+
 	var result = a.slice();
 	b.forEach(function (item) {
 		removeFromSet(result, item);

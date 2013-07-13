@@ -1,3 +1,6 @@
+/* globals smokesignals: true */
+/* exported NodesHandle, LogHandle, HitsHandle, EpochsHandle */
+
 /**
 returns a new NodesHandle
 listen with handle.on("nodes", callback)
@@ -10,6 +13,8 @@ tracer_: a fondue instance
 refreshInterval: milliseconds (default 30)
 **/
 function NodesHandle(tracer_, refreshInterval) {
+	"use strict";
+
 	refreshInterval = (refreshInterval || 30);
 
 	var handle = tracer_.trackNodes();
@@ -61,6 +66,8 @@ refreshInterval: milliseconds (default 30)
 numEntries: number of entries to request at a time (default 50)
 **/
 function LogHandle(tracer_, query, autoFetch, refreshInterval, numEntries) {
+	"use strict";
+
 	// setting default argument values
 	if (autoFetch === undefined) autoFetch = true;
 	refreshInterval = (refreshInterval || 30);
@@ -124,6 +131,8 @@ tracer_: a fondue instance
 refreshInterval: milliseconds (default 30)
 **/
 function HitsHandle(tracer_, refreshInterval) {
+	"use strict";
+
 	refreshInterval = (refreshInterval || 30);
 
 	var handle = tracer_.trackHits();
@@ -161,6 +170,8 @@ tracer_: a fondue instance
 refreshInterval: milliseconds (default 30)
 **/
 function EpochsHandle(tracer_, refreshInterval) {
+	"use strict";
+
 	refreshInterval = (refreshInterval || 30);
 
 	var handle = tracer_.trackEpochs();

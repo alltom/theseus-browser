@@ -1,12 +1,12 @@
+/* globals moment: true, TreeView: true, TreeItemView: true */
+/* exported LogView */
+
 /**
 returns a LogView
 logHandle: a LogHandle
 **/
 function LogView(logHandle, nodesHandle) {
-	// stub for moving elsewhere later
-	function reveal(node) {
-		// editor.setCursorPos(f.start.line - 1, f.start.column, false /* center view */);
-	}
+	"use strict";
 
 	function valueView(value) {
 		if (value.type === "number" || value.type === "boolean") {
@@ -31,9 +31,9 @@ function LogView(logHandle, nodesHandle) {
 
 	function objectInspectorView(obj) {
 		// http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
-		function isNumber(n) {
-			return !isNaN(parseFloat(n)) && isFinite(n);
-		}
+		// function isNumber(n) {
+		// 	return !isNaN(parseFloat(n)) && isFinite(n);
+		// }
 
 		var preview = obj.preview;
 		if (preview === null || preview === undefined) preview = "";
@@ -113,7 +113,7 @@ function LogView(logHandle, nodesHandle) {
 		var $nameCell = $("<th class='fn' />").appendTo($row);
 		// $nameCell.append(_svgForGlyph(_nodeGlyph(log.nodeId)));
 		if (entry.nodeId === "log") {
-			$nameCell.append("console.log")
+			$nameCell.append("console.log");
 		} else {
 			var name = node.name || "(anonymous)";
 			var location = node.path.split("/").slice(-1) + ":" + node.start.line;
@@ -121,7 +121,7 @@ function LogView(logHandle, nodesHandle) {
 			var $nameLink = $("<span class='fn' />").text(name).appendTo($nameCell);
 			$nameCell.append(" ");
 			$nameCell.append($("<span class='path' />").text("(" + location + ")"));
-			$nameCell.on("click", function () { reveal(node) });
+			// $nameCell.on("click", function () { reveal(node) });
 		}
 		// if (options.link && options.link.type === 'async') {
 		// 	var $image = $("<img />").attr("src", ExtensionUtils.getModuleUrl(module, "images/async.png"));
@@ -182,7 +182,7 @@ function LogView(logHandle, nodesHandle) {
 		return itemsByInvocationId[entry.parents[0].invocationId];
 	}
 
-	logHandle.on("queryChanged", function (newQuery) {
+	logHandle.on("queryChanged", function () {
 		treeView.clear();
 		itemsByInvocationId = {};
 	});
