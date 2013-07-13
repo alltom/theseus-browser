@@ -18,6 +18,12 @@
 .CodeMirror {
 	border: 1px solid black;
 }
+.CodeMirror-lines {
+	line-height: 16px;
+}
+.CodeMirror .dead {
+	background: rgba(0, 0, 0, 0.0825);
+}
 body, th, td {
 	font-family: "Helvetica Neue", sans-serif;
 	font-size: 14px;
@@ -44,6 +50,10 @@ $(function () {
 		lineNumbers: true,
 		gutters: ['pill-gutter'],
 	});
+
+	function convertPosToCodeMirror(pos) {
+		return { line: pos.line - 1, ch: pos.column };
+	}
 	
 	var src = editor.getValue();
 	var path = "script1";
@@ -62,6 +72,7 @@ $(function () {
 
 	var pillsByNodeId = {};
 	var nodeGlyphs = {}; // nodeId -> glyph
+	var deadNodeMarks = {}; // nodeId -> CodeMirror mark
 	
 	var logView = LogView(logHandle, nodesHandle);
 	var queryBar = QueryBarView();
@@ -152,6 +163,12 @@ $(function () {
 					logHandle.setQuery(query);
 				});
 			}
+
+			if (["function", "branch"].indexOf(node.type) !== -1) {
+				if (!totalHitsByNodeId[node.id]) {
+					deadNodeMarks[node.id] = editor.markText(convertPosToCodeMirror(node.start), convertPosToCodeMirror(node.end), { className: "dead" });
+				}
+			}
 		});
 	});
 	
@@ -160,6 +177,11 @@ $(function () {
 		for (var nodeId in delta) {
 			totalHitsByNodeId[nodeId] || (totalHitsByNodeId[nodeId] = 0);
 			totalHitsByNodeId[nodeId] += delta[nodeId];
+
+			if (deadNodeMarks[nodeId]) {
+				deadNodeMarks[nodeId].clear();
+				delete deadNodeMarks[nodeId];
+			}
 
 			var pill = pillsByNodeId[nodeId];
 			if (pill) {
