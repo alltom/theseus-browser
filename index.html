@@ -61,6 +61,7 @@ $(function () {
 	var epochsHandle = EpochsHandle(fiddleTracer);
 
 	var pillsByNodeId = {};
+	var nodeGlyphs = {}; // nodeId -> glyph
 	
 	var logView = LogView(logHandle, nodesHandle);
 	var queryBar = QueryBarView();
@@ -134,8 +135,10 @@ $(function () {
 
 	nodesHandle.on("nodes", function (nodes) {
 		nodes.filter(function (node) { return node.path === path }).forEach(function (node) {
+			nodeGlyphs[node.id] = _glyphCycle.next();
+
 			if (node.type === "function") {
-				var pill = pillsByNodeId[node.id] = new PillView(editor, node.start.line - 1, _glyphCycle.next());
+				var pill = pillsByNodeId[node.id] = new PillView(editor, node.start.line - 1, nodeGlyphs[node.id]);
 				pill.on("click", function () {
 					pill.toggle();
 
@@ -166,14 +169,9 @@ $(function () {
 </script>
 
 <textarea id="code">
-$(document.body).on('mousemove', function () {
-});
-
-$(document.body).on('click', function () {
-});
-
-$(document.body).on('keypress', function () {
-});
+$(document.body).on('mousemove', function () { });
+$(document.body).on('click', function () { });
+$(document.body).on('keypress', function () { });
 
 setInterval(function () {
 	if (Math.random() &lt; 0.5) {
@@ -182,4 +180,13 @@ setInterval(function () {
 		console.lgo("hi")
 	}
 }, 2000);
+
+function fib(n) {
+	if (n &lt; 3) {
+		return n;
+	} else {
+		return fib(n - 2) + fib(n - 1);
+	}
+}
+fib(5);
 </textarea>

@@ -139,27 +139,24 @@ function LogView(logHandle, nodesHandle) {
 		$timeCell.text(moment(timestamp).format("h:mm:ss.SSS"));
 
 		// value cells
+		function addValueCell(name, value, klass) {
+			var $name = $("<strong />").text(name);
+			if (klass) $name.addClass(klass);
+			$("<td class='value' />").append($name)
+			                         .append(valueView(value))
+			                         .appendTo($row);
+		}
 		for (var i = 0; i < entry.arguments.length; i++) {
 			var arg = entry.arguments[i];
-
-			if (entry.nodeId === "log") {
-				$row.append($("<td />").append(valueView(arg.value)));
-			} else {
-				var name = arg.name || ("arguments[" + i + "]");
-				$row.append($("<td />").append($("<strong />").text(name + " = "))
-									   .append(valueView(arg.value)));
-			}
+			addValueCell((arg.name || ("arguments[" + i + "]")) + " = ", arg.value);
 		}
-		if (entry.returnValue) {
-			$row.append($("<td />").append($("<strong />").text("return value = "))
-								   .append(valueView(entry.returnValue)));
+		if ("returnValue" in entry) {
+			addValueCell("return value = ", entry.returnValue);
 		} else if (entry.exception) {
-			$row.append($("<td />").append($("<strong style='color: red' />").text("exception = "))
-								   .append(valueView(entry.exception, { wholePreview: true })));
+			addValueCell("exception = ", entry.exception, "exception");
 		}
-		if (entry.this) {
-			$row.append($("<td />").append($("<strong />").text("this = "))
-								   .append(valueView(entry.this)));
+		if ("this" in entry) {
+			addValueCell("this = ", entry.this);
 		}
 
 		// $row.append($("<td class='backtrace-link' />").append($("<a />").html("Backtrace &rarr;").click(function () {
@@ -174,15 +171,33 @@ function LogView(logHandle, nodesHandle) {
 	var treeView = TreeView();
 	treeView.$dom.appendTo($dom);
 
+	var itemsByInvocationId = {}; // invocationId -> item
+
+	function findParentItem(entry) {
+		if (!entry.parents) {
+			return undefined;
+		}
+
+		// TODO: resolve multiple parents
+		return itemsByInvocationId[entry.parents[0].invocationId];
+	}
+
 	logHandle.on("queryChanged", function (newQuery) {
 		treeView.clear();
+		itemsByInvocationId = {};
 	});
 
 	logHandle.on("entries", function (entries) {
 		entries.forEach(function (entry) {
-			var itemView = TreeItemView();
+			var itemView = itemsByInvocationId[entry.invocationId] = TreeItemView();
 			itemView.$content.append(entryTable(entry));
-			treeView.append(itemView);
+
+			var parentItem = findParentItem(entry);
+			if (parentItem) {
+				parentItem.append(itemView);
+			} else {
+				treeView.append(itemView);
+			}
 		});
 	});
 

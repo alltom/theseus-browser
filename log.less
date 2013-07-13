@@ -1,57 +1,63 @@
-.log-entry {
-	// text-align: center;
-	vertical-align: middle;
-	border: 1px solid #ddd;
-	border-spacing: 0;
-	border-collapse: collapse;
-	margin: 0px;
-	width: auto;
-	color: black;
+.log {
+	.log-entry {
+		// text-align: center;
+		vertical-align: middle;
+		border: 1px solid #ddd;
+		border-spacing: 0;
+		border-collapse: collapse;
+		margin: 0px;
+		width: auto;
+		color: black;
 
-	td, th {
-		border-width: 0px;
-		margin: 0;
-		padding: 4px 8px;
-		text-align: left;
-	}
+		td, th {
+			border-width: 0px;
+			margin: 0;
+			padding: 4px 8px;
+			text-align: left;
+		}
 
-	th.fn {
-		border: 1px solid #666;
-		border-width: 0 0 0 1px;
-		font-weight: normal;
-		cursor: pointer;
+		th.fn {
+			border: 1px solid #666;
+			border-width: 0 0 0 1px;
+			font-weight: normal;
+			cursor: pointer;
 
-		span.fn {
-			color: #1069d6;
+			span.fn {
+				color: #1069d6;
 
-			&:hover {
+				&:hover {
+					text-decoration: underline;
+				}
+			}
+
+			span.path {
+				color: #888;
+			}
+		}
+
+		td.timestamp {
+			font-weight: normal;
+			font-size: 11px;
+		}
+
+		td.value .exception {
+			color: red;
+		}
+
+		td.backtrace-link {
+			cursor: pointer;
+
+			a:hover {
 				text-decoration: underline;
 			}
 		}
 
-		span.path {
-			color: #888;
+		.objects-bad {
+			cursor: not-allowed;
 		}
 	}
 
-	td.timestamp {
-		font-weight: normal;
-		font-size: 11px;
+	.tree-item-children {
+		padding-left: 20px;
 	}
-
-	td.backtrace-link {
-		cursor: pointer;
-
-		a:hover {
-			text-decoration: underline;
-		}
-	}
-
-	.objects-bad {
-		cursor: not-allowed;
-	}
-}
-
-div.indented {
-	padding-left: 20px;
 }
