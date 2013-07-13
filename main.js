@@ -1,23 +1,16 @@
-/* global Cycle, Glyph, CodeMirror, fondue, fiddleTracer, LogHandle, NodesHandle, HitsHandle, EpochsHandle, PillView, LogView, QueryBarView, QueryBarItem, addToSet, removeFromSet, setDifference */
+/* global Cycle, Glyph, CodeMirror, fondue, fiddleTracer, LogHandle, NodesHandle, HitsHandle, EpochsHandle, PillView, LogView, QueryBarView, QueryBarItem, addToSet, removeFromSet, setDifference, evalWrapper */
 /* jshint evil: true, newcap: false */
+"use strict";
 
 var _colorCycle = new Cycle("#1f77b4 #ff7f0e #2ca02c #d62728 #9467bd #8c564b #e377c2 #7f7f7f #bcbd22 #17becf #000000".split(" "));
 var _shapeCycle = new Cycle(["circle", "square"]);
 var _glyphCycle = {
 	next: function () {
-		"use strict";
 		return new Glyph(_shapeCycle.next(), _colorCycle.next());
 	},
 };
 
-function evalWrapper(src) {
-	/* jshint strict: false */
-	eval(src);
-}
-
 $(function () {
-	"use strict";
-
 	var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
 		lineNumbers: true,
 		gutters: ["pill-gutter"],

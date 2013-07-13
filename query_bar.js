@@ -1,13 +1,12 @@
 /* global smokesignals: true, addToSet: true, removeFromSet: true */
 /* exported QueryBarView, QueryBarItem */
+"use strict";
 
 /**
 returns a QueryBarView
 call QueryBarItem() to get items for passing to enableItem and disableItem
 **/
 function QueryBarView() {
-	"use strict";
-
 	var $dom = $("<div class='query-bar' />");
 
 	var items = [];
@@ -45,8 +44,6 @@ change sortIndex to affect its sorting order
 name: name to appear in the bar
 **/
 function QueryBarItem(name, glyph) {
-	"use strict";
-
 	var $dom = $("<span class='query-bar-item' />");
 	var $name = $("<span class='name' />").appendTo($dom).text(name);
 	if (glyph) {

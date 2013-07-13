@@ -1,13 +1,13 @@
 /* globals moment: true, TreeView: true, TreeItemView: true */
 /* exported LogView */
+/* jshint newcap: false */
+"use strict";
 
 /**
 returns a LogView
 logHandle: a LogHandle
 **/
 function LogView(logHandle, nodesHandle) {
-	"use strict";
-
 	function valueView(value) {
 		if (value.type === "number" || value.type === "boolean") {
 			return $("<span />").text(value.value);

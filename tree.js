@@ -1,13 +1,12 @@
 /* global smokesignals: true */
 /* exported TreeView, TreeItemView */
+"use strict";
 
 /**
 returns a TreeView
 call TreeItemView() to get items
 **/
 function TreeView() {
-	"use strict";
-
 	var $dom = $("<div class='tree' />");
 
 	var roots = [];
@@ -42,8 +41,6 @@ function TreeView() {
 returns a TreeItemView for use with a TreeView
 **/
 function TreeItemView() {
-	"use strict";
-
 	var $dom = $("<div class='tree-item' />");
 	var $content = $("<div class='tree-item-content' />").appendTo($dom);
 	var $children = $("<div class='tree-item-children' />").appendTo($dom);
